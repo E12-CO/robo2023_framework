@@ -18,7 +18,7 @@ class ImgNode(Node):
         #Create service to start servo from main node
         self.srv = self.create_service(Imgres, 'get_img_res', self.service_callbacK)
 
-        pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe' # CHANGE TO PATH
+        # pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe' # CHANGE TO PATH
 
 
     def service_callbacK(self, req, res):
@@ -35,6 +35,7 @@ class ImgNode(Node):
         cap = cv2.VideoCapture(0)
         cap.set(3,640)
         cap.set(4,480)
+        message = ""
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -43,6 +44,7 @@ class ImgNode(Node):
             message = self.generate_output(frame)
             break
         cap.release()
+        print(message)
         return message
     
     def binarycheck(self, img,found_numbers):
@@ -233,7 +235,7 @@ class ImgNode(Node):
                 x = int(M['m10']/M['m00'])
                 y = int(M['m01']/M['m00'])
             return int(area)
-        cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
+        # cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
         # cv2.imshow('s',img)
         return int(random.randint(0,5000))
 
