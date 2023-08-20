@@ -245,6 +245,7 @@ class ImgNode(Node) :
             store_shape.append(self.Area(second_row[i]))
             store_numbers.append(self.text_check(third_row[i]))
             store_binary.append(self.binarycheck(first_row[i],found_numbers))
+            
         # result = classify_shape(store_shape)
 
         for ind,i in enumerate(store_numbers):
@@ -293,6 +294,10 @@ class ImgNode(Node) :
         store_shape = [int(outputlist[0][1]),int(outputlist[1][1]),int(outputlist[2][1]),int(outputlist[3][1]),int(outputlist[4][1])]
         store_text = []
         stored_data = [store_bin,store_shape,store_text]
+        for i in range(len(store_shape)):
+            for j in range(len(store_shape)) : 
+                if store_shape[j] != -1 and store_shape[i] == store_shape[j] and i != j:
+                    store_shape[i] = random.randint(500,1000)
         for room in range(len(outputlist)):
             for task in range(len(outputlist[room])):
                 if outputlist[room][task] not in "12345" and task == 0 :
