@@ -11,7 +11,7 @@ from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessStart
 
 from launch_ros.actions import Node
-
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
@@ -20,7 +20,9 @@ def generate_launch_description():
     # Include the robot_state_publisher launch file, provided by our own package. Force sim time to be enabled
     # !!! MAKE SURE YOU SET THE PACKAGE NAME CORRECTLY !!!
 
-    package_name='robo2023' #<--- CHANGE ME
+    package_name='robo2023'
+
+    pkg_share = FindPackageShare(package=package_name).find(package_name)
 
     rsp = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
@@ -28,8 +30,13 @@ def generate_launch_description():
                 )]), launch_arguments={'use_sim_time': 'false', 'use_ros2_control': 'true'}.items()
     )
 
-    
-
+    twist_mux_params = os.path.join(get_package_share_directory(package_name),'config','twist_mux.yaml')
+    twist_mux = Node(
+            package="twist_mux",
+            executable="twist_mux",
+            parameters=[twist_mux_params],
+            remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
+        )
 
     robot_description = Command(['ros2 param get --hide-type /robot_state_publisher robot_description'])
 
@@ -70,6 +77,18 @@ def generate_launch_description():
         )
     )
 
+    robot_localization_file_path = os.path.join(pkg_share, 'config/ekf.yaml') 
+
+
+    start_robot_localization_cmd = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[robot_localization_file_path, 
+        {'use_sim_time': False}],
+        )
+
 
     # Code for delaying a node (I haven't tested how effective it is)
     # 
@@ -92,6 +111,7 @@ def generate_launch_description():
     # Launch them all!
     return LaunchDescription([
         rsp,
+        twist_mux,
         delayed_controller_manager,
         delayed_diff_drive_spawner,
         delayed_joint_broad_spawner
