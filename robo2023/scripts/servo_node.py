@@ -22,8 +22,10 @@ class ServoNode(Node):
     def service_callbacK(self, req, res):
         print("I receive request")
 
+        reqstr = req.servo + "\n"
+        
         #Send servo data to esp32
-        self.ser.write(req.servo)
+        self.ser.write(reqstr)
 
         #loop until servo is finish
         self.ser.write("t") # TO CHANGE
