@@ -26,9 +26,9 @@ class ServoNode(Node):
         self.ser.write(req.servo)
 
         #loop until servo is finish
-        self.ser.write("finish?") # TO CHANGE
-        while self.ser.read(10) != "true":
-            self.ser.write("finish?")
+        self.ser.write("t") # TO CHANGE
+        while self.ser.read(10) != "T":
+            self.ser.write("t")
 
         res.result = True    
         return res
